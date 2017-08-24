@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,77 +24,110 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.LOCATION_SERVICE;
 
 /**
  * Created by Sabiha on 8/20/2017.
  */
 
-public class LocationDetails extends Service implements LocationListener {
+public class LocationDetails extends Service {
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private final Context locContext;
+    final Context locContext;
+    Activity activity;
     Location location;
     LocationManager locManager;
     double longitude;
     double latitude;
     int geocoderMaxResults = 1;
-
-    public LocationDetails(Context context)
+    String provider;
+    public LocationDetails(Context context, Activity activity)
     {
         this.locContext = context;
-        getLocation();
+        this.activity = activity;
+        provider = LocationManager.NETWORK_PROVIDER;
     }
 
-    private void getLocation() {
-        //Permission.check_FINE_LOCATION_Permission(this);
+    public LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location loc) {
 
-        if (ContextCompat.checkSelfPermission(locContext,
-                Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) locContext,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions((Activity)locContext,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+            Log.d("MSG", location.toString());
+            if(loc != null) location = loc;
+            updateCoordinate();
         }
 
-        locManager = (LocationManager) locContext.getSystemService(LOCATION_SERVICE);
-        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        if(locManager != null)
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
+    public void getLocation() {
+        try {
+            //Permission.check_FINE_LOCATION_Permission(this);
+            locManager = (LocationManager) locContext.getSystemService(LOCATION_SERVICE);
+            boolean isProviderEnabled = locManager.isProviderEnabled(provider);
+
+            if (isProviderEnabled && Permission.check_FINE_LOCATION_Permission(activity, 1)) {
+            /*Criteria locationCritera = new Criteria();
+            String providerName = locManager.getBestProvider(locationCritera, true);
+            if(providerName!=null)
+            {
+                location = locManager.getLastKnownLocation(provider);
+                updateCoordinate();
+            }*/
+
+                locManager.requestLocationUpdates(provider, 0, 0, mLocationListener);
+                if (!locManager.equals(null)) {
+                    location = (Location) locManager.getLastKnownLocation(provider);
+                    updateCoordinate();
+                }
+            }
+        }
+        catch(Exception e)
         {
-            location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            updateCoordinate();
+            Log.d("LOC", "Location Error");
         }
     }
 
     private void updateCoordinate() {
         if(location != null) {
+            if(location.getLongitude()==0.0 && location.getLatitude()==0.0)
+            {
+                getLocation();
+                return;
+            }
             longitude = location.getLongitude();
             latitude = location.getLatitude();
         }
     }
 
     public double getLongitude(){
+        if(location != null){
+            longitude = location.getLongitude();
+        }
+
+        // return longitude
         return longitude;
     }
 
     public double getLatitude(){
+        if(location != null){
+            latitude = location.getLatitude();
+        }
+
+        // return latitude
         return latitude;
     }
 
@@ -131,29 +165,24 @@ public class LocationDetails extends Service implements LocationListener {
         }
     }
 
+    public void unRegisterLocation()
+    {
+        if(Permission.check_FINE_LOCATION_Permission((Activity) locContext, 1)) {
+            locManager.removeUpdates(mLocationListener);
+        }
+    }
+
+    public void registerLocation()
+    {
+        /*if(Permission.check_FINE_LOCATION_Permission(locContext)) {
+            locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, mLocationListener);
+        }*/
+    }
+
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 }
