@@ -19,23 +19,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 public class Permission {
     public static boolean check_FINE_LOCATION_Permission(Activity activity, int requestCode_ACCESS_FINE_LOCATION) {
-        /*if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            return true;
-        }
-        try {
-            int result = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
-            int result1 = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
-            if (result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode_ACCESS_FINE_LOCATION);
-                return false;
-            }
-        }
-        catch (RuntimeException exceptionIgnored){
-            Log.d("Error", exceptionIgnored.getMessage(), exceptionIgnored);
-            return false;
-        }*/
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             if(ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

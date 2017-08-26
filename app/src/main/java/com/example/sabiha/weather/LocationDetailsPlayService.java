@@ -25,14 +25,21 @@ import com.google.android.gms.location.LocationServices;
 public class LocationDetailsPlayService  implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    public abstract interface LocationCallback {
+        public void handleNewLocation(Location location);
+    }
+
     private Context locContext;
     private GoogleApiClient locGoogleApiClient;
     //private Location location;
     private LocationRequest locRequest;
     private double longitude, latitude;
-    public LocationDetailsPlayService(Context context)
+    private LocationCallback mLocationCallback;
+
+    public LocationDetailsPlayService(Context context, LocationCallback callback)
     {
         locContext = context;
+        mLocationCallback = callback;
         locGoogleApiClient = new GoogleApiClient.Builder(locContext)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -43,6 +50,16 @@ public class LocationDetailsPlayService  implements GoogleApiClient.ConnectionCa
         locRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locRequest.setInterval(AppConstants.UPDATE_INTERVAL);
         locRequest.setFastestInterval(AppConstants.FASTEST_INTERVAL);
+    }
+
+    public double getLongitude()
+    {
+        return longitude;
+    }
+
+    public double getLatitude()
+    {
+        return latitude;
     }
 
     public void startConnection()
@@ -63,27 +80,25 @@ public class LocationDetailsPlayService  implements GoogleApiClient.ConnectionCa
     public void getLocationUpdate()
     {
 
-        if (ActivityCompat.checkSelfPermission(locContext, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(locContext, "Enable Permissions", Toast.LENGTH_LONG).show();
+        if(Permission.check_FINE_LOCATION_Permission((Activity) locContext, AppConstants.LOCATION_PERMISSION_REQUEST_CODE)) {
+            Location location = LocationServices.FusedLocationApi.getLastLocation(locGoogleApiClient);
+            //if (location == null) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(locGoogleApiClient, locRequest, this);
+            //} else {
+            mLocationCallback.handleNewLocation(location);
+            //}
         }
 
     }
 
-    public void handleNewLocation(Location location)
+    /*public void handleNewLocation(Location location)
     {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-    }
+    }*/
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if(Permission.check_FINE_LOCATION_Permission((Activity) locContext, AppConstants.LOCATION_PERMISSION_REQUEST_CODE)) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(locGoogleApiClient);
-            if (location == null) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(locGoogleApiClient, locRequest, this);
-            } else {
-                handleNewLocation(location);
-            }
-        }
+        getLocationUpdate();
     }
 
     @Override
@@ -114,8 +129,7 @@ public class LocationDetailsPlayService  implements GoogleApiClient.ConnectionCa
             }
         } else {
             /*
-             * If no resolution is available, display a dialog to the
-             * user with the error.
+              * user with the error.
              */
             Log.i("ERROR", "Location services connection failed with code " + connectionResult.getErrorCode());
         }
@@ -123,6 +137,6 @@ public class LocationDetailsPlayService  implements GoogleApiClient.ConnectionCa
 
     @Override
     public void onLocationChanged(Location location) {
-        handleNewLocation(location);
+        mLocationCallback.handleNewLocation(location);
     }
 }
