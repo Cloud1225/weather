@@ -48,7 +48,7 @@ public class FetchLocationAddressIntent extends IntentService {
         List<Address> addresses = null;
 
         try{
-            addresses = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            addresses = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 3);
         }
         catch(IOException ioException)
         {
@@ -69,6 +69,7 @@ public class FetchLocationAddressIntent extends IntentService {
             Log.i(Tag, addresses.toString());
 
             Address address = addresses.get(0);
+            Log.i(Tag, address.toString());
             ArrayList<String> addressFragments = new ArrayList<String>();
 
             // Fetch the address lines using getAddressLine,
@@ -77,8 +78,13 @@ public class FetchLocationAddressIntent extends IntentService {
                 addressFragments.add(address.getAddressLine(i));
             }
 
-            Log.i(Tag, TextUtils.join(System.getProperty("line.separator"),
-                    addressFragments));
+            String countryName = address.getCountryName();
+            String countryCode = address.getCountryCode();
+            String locality = address.getLocality();
+            String featureName = address.getFeatureName();
+
+
+            Log.i(Tag, featureName+"  "+locality+"  "+countryCode+"  "+countryName);
 
             deliverResultToReceiver(AppConstants.SUCCESS_RESULT,
                     TextUtils.join(System.getProperty("line.separator"),
