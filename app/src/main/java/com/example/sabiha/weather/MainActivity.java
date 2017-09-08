@@ -1,33 +1,54 @@
 package com.example.sabiha.weather;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
 
 
 public class MainActivity extends AppCompatActivity  implements LocationDetailsPlayService.LocationCallback{
 
 
-    TextView latLng, addressTV;
+    TextView tempTV, descTV, windTV;
+    ImageView iconView;
 
     LocationDetailsPlayService LDPS;
     private AddressResultReceiver addResReceiver;
-
+    String Tag = MainActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        latLng = (TextView) findViewById(R.id.tb);
-        addressTV = (TextView) findViewById(R.id.textView2);
+        //latLng = (TextView) findViewById(R.id.tb);
+        //addressTV = (TextView) findViewById(R.id.textView2);
+        tempTV = (TextView) findViewById(R.id.temp_textView);
+        descTV = (TextView) findViewById(R.id.desc_textView);
+        windTV = (TextView) findViewById(R.id.wind_textView);
+
+        iconView = (ImageView) findViewById(R.id.icon_iView);
+
         LDPS = new LocationDetailsPlayService(this, this);
         addResReceiver = new AddressResultReceiver(new Handler());
+
+        // Find the toolbar view inside the activity layout
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar(toolbar);
     }
 
     private void loadLocation()
@@ -36,7 +57,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
             String stringLongitude = String.valueOf(LDPS.getLongitude());
             String stringLatitude = String.valueOf(LDPS.getLatitude());
-            latLng.setText(stringLongitude + "  " + stringLatitude);
+            //latLng.setText(stringLongitude + "  " + stringLatitude);
         }
     }
 
@@ -51,7 +72,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
         super.onResume();
 
         if (!Permission.checkPlayServices(this)) {
-            latLng.setText("Please install Google Play services.");
+            //latLng.setText("Please install Google Play services.");
         }
         //loadLocation();
     }
@@ -92,9 +113,12 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
             double currentLatitude = location.getLatitude();
             double currentLongitude = location.getLongitude();
 
-            latLng.setText(currentLongitude + "  " + currentLatitude);
+            //latLng.setText(currentLongitude + "  " + currentLatitude);
 
             startIntentService(location);
+
+            JasonAsyncTask jasonAsyncTask = new JasonAsyncTask();
+            jasonAsyncTask.execute(new Location[]{location});
         }
     }
 
@@ -108,7 +132,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
     private void displayAddressOutput(String address)
     {
-        addressTV.setText(address);
+        //addressTV.setText(address);
         LDPS.stopConnection();
     }
 
@@ -138,5 +162,38 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
         }
 
+    }
+
+    public class JasonAsyncTask extends AsyncTask<Location, Void, WeatherDetails> {
+        @Override
+        protected WeatherDetails doInBackground(Location... params) {
+            WeatherDetails weather;
+            String data = JasonParser.getWeatherData(params[0]);
+            Log.i(Tag, data);
+            try {
+                weather = JasonParser.getWeatherDetails(data);
+                weather.iconData = JasonParser.getWeatherImage(weather.currentWeather.getIcon());
+                return weather;
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(WeatherDetails weatherDetails) {
+            super.onPostExecute(weatherDetails);
+            Log.d(Tag, weatherDetails.iconData.toString());
+            tempTV.setText(String.valueOf(weatherDetails.main.getTemperature()));
+            descTV.setText(weatherDetails.currentWeather.getDescription());
+            windTV.setText("Dir: "+weatherDetails.wind.getWindDirection()+"  Speed: "+weatherDetails.wind.getWindSpeed());
+
+            if (weatherDetails.iconData != null && weatherDetails.iconData.length > 0) {
+                Bitmap img = BitmapFactory.decodeByteArray(weatherDetails.iconData, 0, weatherDetails.iconData.length);
+                iconView.setImageBitmap(img);
+            }
+        }
     }
 }
