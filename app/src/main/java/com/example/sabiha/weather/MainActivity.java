@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
 import org.json.JSONException;
 
 
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
 
     TextView tempTV, descTV, windTV;
-    ImageView iconView;
+    ImageView iconView, windGIF;
 
     LocationDetailsPlayService LDPS;
     private AddressResultReceiver addResReceiver;
@@ -40,6 +42,9 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
         windTV = (TextView) findViewById(R.id.wind_textView);
 
         iconView = (ImageView) findViewById(R.id.icon_iView);
+        windGIF = (ImageView) findViewById(R.id.windGIF);
+        //GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(windGIF);
+        Glide.with(this).load(R.raw.windmill).into(windGIF);
 
         LDPS = new LocationDetailsPlayService(this, this);
         addResReceiver = new AddressResultReceiver(new Handler());
@@ -185,15 +190,16 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
         @Override
         protected void onPostExecute(WeatherDetails weatherDetails) {
             super.onPostExecute(weatherDetails);
-            Log.d(Tag, weatherDetails.iconData.toString());
+            //Log.d(Tag, weatherDetails.iconData.toString());
             tempTV.setText(String.valueOf(weatherDetails.main.getTemperature()));
             descTV.setText(weatherDetails.currentWeather.getDescription());
-            windTV.setText("Dir: "+weatherDetails.wind.getWindDirection()+"  Speed: "+weatherDetails.wind.getWindSpeed());
 
             if (weatherDetails.iconData != null && weatherDetails.iconData.length > 0) {
                 Bitmap img = BitmapFactory.decodeByteArray(weatherDetails.iconData, 0, weatherDetails.iconData.length);
                 iconView.setImageBitmap(img);
             }
+
+            windTV.setText("Dir: "+weatherDetails.wind.getWindDirection()+"  Speed: "+weatherDetails.wind.getWindSpeed());
         }
     }
 }
