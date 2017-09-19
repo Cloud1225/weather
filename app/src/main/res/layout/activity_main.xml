@@ -75,35 +75,39 @@
             android:textColor="@android:color/black"
             android:lineSpacingExtra="10dp"
             />
-        <ImageView
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/windGIF"
             android:layout_below="@id/windTitle_textView"
-            android:layout_toLeftOf="@+id/wind_textView"
-            android:layout_alignParentLeft="true"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:id="@+id/wind_textView"
-            android:layout_below="@+id/windTitle_textView"
-            android:textColor="@android:color/black"
-            android:layout_marginTop="30dp"
-            android:layout_alignParentRight="true"
-            />
-
-            <com.example.sabiha.weather.CustomView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/custom_layout"
-                android:layout_below="@+id/windGIF"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="40dp"
-                app:circleColor="@android:color/darker_gray"
+            android:id="@+id/windRelLayout"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/windGIF"
+                android:layout_toLeftOf="@+id/wind_textView"
+                android:layout_alignParentLeft="true"
                 />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:id="@+id/wind_textView"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="30dp"
+                android:layout_alignParentRight="true"
+                />
+        </RelativeLayout>
+        <com.example.sabiha.weather.CustomView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/custom_layout"
+            android:layout_below="@+id/windRelLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="40dp"
+            app:circleColor="@android:color/darker_gray"
+            />
         </RelativeLayout>
     </android.support.v4.widget.NestedScrollView>
 

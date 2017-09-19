@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
     LocationDetailsPlayService LDPS;
     private AddressResultReceiver addResReceiver;
     String Tag = MainActivity.class.getSimpleName();
+    public WeatherDetails weather;
+    CustomView customView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
         iconView = (ImageView) findViewById(R.id.icon_iView);
         windGIF = (ImageView) findViewById(R.id.windGIF);
+        customView = (CustomView) findViewById(R.id.custom_layout);
         //GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(windGIF);
         Glide.with(this).load(R.raw.windmill).into(windGIF);
 
@@ -172,7 +175,6 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
     public class JasonAsyncTask extends AsyncTask<Location, Void, WeatherDetails> {
         @Override
         protected WeatherDetails doInBackground(Location... params) {
-            WeatherDetails weather;
             String data = JasonParser.getWeatherData(params[0]);
             Log.i(Tag, data);
             try {
@@ -191,6 +193,8 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
         protected void onPostExecute(WeatherDetails weatherDetails) {
             super.onPostExecute(weatherDetails);
             //Log.d(Tag, weatherDetails.iconData.toString());
+            Log.e(Tag, String.valueOf(weather.system.getSunrise()));
+            Log.e(Tag, String.valueOf(weather.dateTime));
             tempTV.setText(String.valueOf(weatherDetails.main.getTemperature()));
             descTV.setText(weatherDetails.currentWeather.getDescription());
 

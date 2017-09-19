@@ -21,7 +21,8 @@ public class CustomView extends View {
     private int labelPosition;
     private Paint circlePaint;
 
-    private  double xNew, yNew, xOld, yOld;
+    private  double xNew, yNew, xOld, yOld, radius, width, height;
+    private double smallCirRadius = 15, padding = 20;
     public CustomView(Context context, AttributeSet attributeSet)
     {
         super(context, attributeSet);
@@ -35,37 +36,40 @@ public class CustomView extends View {
         }
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        float width = this.getMeasuredWidth()/2;
-        float height = this.getMeasuredHeight()/2;
+    public void initialize()
+    {
+        width = this.getMeasuredWidth()/2;
+        height = this.getMeasuredHeight()/2;
 
         //getResources().getDisplayMetrics().widthPixels + " " + ge
-        Log.e("CustomView", getResources().getDisplayMetrics().widthPixels + " " + getResources().getDisplayMetrics().heightPixels);
-        Log.e("CustomView", width +"  "+height);
+        //Log.e("CustomView", getResources().getDisplayMetrics().widthPixels + " " + getResources().getDisplayMetrics().heightPixels);
+        //Log.e("CustomView", width +"  "+height);
 
-        float radius = width > height ? height - 20 - 15 : width - 20 - 15;
-        Log.e("CustomView_Radius: ", String.valueOf(radius));
+        radius = width > height ? height - padding - smallCirRadius : width - padding - smallCirRadius;
+        //Log.e("CustomView_Radius: ", String.valueOf(radius));
         circlePaint.setColor(color);
         circlePaint.setAntiAlias(true);
         circlePaint.setStyle(Paint.Style.STROKE);
         circlePaint.setStrokeWidth(3);
+
+        xOld = width - radius;
+        yOld = height;
+    }
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         circlePaint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0));
-        RectF rectf = new RectF(width - radius, height - radius, width + radius, height + radius);
+        RectF rectf = new RectF((float) (width - radius), (float) (height - radius), (float) (width + radius), (float) (height + radius));
         canvas.drawArc(rectf, 180, 180, false, circlePaint);
 
-        float secCircleX = width - radius;
-        float secCircleY = height;
         circlePaint.setPathEffect(null);
-        canvas.drawCircle(secCircleX, secCircleY, 15, circlePaint);
+        canvas.drawCircle((float) xOld, (float) yOld, (float) smallCirRadius, circlePaint);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
-
+        initialize();
     }
     public int getColor()
     {
