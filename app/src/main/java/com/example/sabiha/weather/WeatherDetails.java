@@ -1,5 +1,8 @@
 package com.example.sabiha.weather;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by Sabiha on 8/29/2017.
  */
@@ -7,7 +10,7 @@ package com.example.sabiha.weather;
 public class WeatherDetails {
 
     public int condition;
-    public long dateTime;
+    private long dateTime;
     public double snowVolume;
     public double rainVolume;
     public double cloudiness;
@@ -17,6 +20,16 @@ public class WeatherDetails {
     public Wind wind = new Wind();
     public Main main = new Main();
     public Weather currentWeather = new Weather();
+
+    public Date getDateTime() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(dateTime * 1000L);
+        return cal.getTime();
+    }
+
+    public void setDateTime(long dateTime) {
+        this.dateTime = dateTime;
+    }
 
     public class Coordinator{
         private double longitude;
@@ -237,16 +250,34 @@ public class WeatherDetails {
             this.message = message;
         }
 
-        public long getSunrise() {
-            return sunrise;
+        public double getSunriseHours() {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(sunrise * 1000L);
+            double hours = cal.getTime().getHours() + (cal.getTime().getMinutes()/60.0) + (cal.getTime().getSeconds()/3600.0);
+            return hours;
+        }
+        public Date getSunrise()
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(sunrise * 1000L);
+            return cal.getTime();
         }
 
         public void setSunrise(long sunrise) {
             this.sunrise = sunrise;
         }
 
-        public long getSunset() {
-            return sunset;
+        public double getSunsetHours() {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(sunset * 1000L);
+            double hours = cal.getTime().getHours() + (cal.getTime().getMinutes()/60.0) + (cal.getTime().getSeconds()/3600.0);
+            return hours;
+        }
+        public Date getSunset()
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(sunset * 1000L);
+            return cal.getTime();
         }
 
         public void setSunset(long sunset) {

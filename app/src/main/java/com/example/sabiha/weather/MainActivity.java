@@ -20,6 +20,9 @@ import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 
+import java.util.Calendar;
+import java.util.Date;
+
 
 public class MainActivity extends AppCompatActivity  implements LocationDetailsPlayService.LocationCallback{
 
@@ -192,9 +195,16 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
         @Override
         protected void onPostExecute(WeatherDetails weatherDetails) {
             super.onPostExecute(weatherDetails);
-            //Log.d(Tag, weatherDetails.iconData.toString());
-            Log.e(Tag, String.valueOf(weather.system.getSunrise()));
-            Log.e(Tag, String.valueOf(weather.dateTime));
+            Log.e(Tag, String.valueOf(weather.system.getSunriseHours()));
+            Log.e(Tag, String.valueOf(weather.system.getSunsetHours()));
+            Log.e(Tag, weather.getDateTime().toString());
+
+            double centerTime = (weather.system.getSunriseHours() + weather.system.getSunsetHours())/2;
+            Log.e(Tag, String.valueOf(centerTime));
+            double preTime = presentTimeCalc();
+            Log.e(Tag, String.valueOf(preTime));
+            customView.animCalc(weather.system.getSunriseHours(), weather.system.getSunsetHours(), preTime, centerTime);
+            animateCircle();
             tempTV.setText(String.valueOf(weatherDetails.main.getTemperature()));
             descTV.setText(weatherDetails.currentWeather.getDescription());
 
@@ -205,5 +215,28 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
             windTV.setText("Dir: "+weatherDetails.wind.getWindDirection()+"  Speed: "+weatherDetails.wind.getWindSpeed());
         }
+    }
+
+    private double presentTimeCalc()
+    {
+        Date date = Calendar.getInstance().getTime();
+        double hours = date.getHours() + (date.getMinutes()/60.0) + (date.getSeconds()/3600.0);
+        Log.e(Tag + "Current Time", Calendar.getInstance().getTime().toString());
+        return hours;
+    }
+
+    public void animateCircle()
+    {
+        while (customView.xNew >= customView.currentPosX)
+        {
+            customView.currentPosX += 1;
+            customView.currentPosY -= 1;
+            if(customView.currentPosY < customView.yNew)
+                customView.currentPosY = customView.yNew;
+            Log.e(Tag, "X: "+customView.currentPosX + " Y: "+ customView.currentPosY);
+            customView.invalidate();
+            //customView.requestLayout();
+        }
+        //requestLayout();
     }
 }

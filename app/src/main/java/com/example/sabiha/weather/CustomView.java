@@ -6,7 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
+import android.nfc.Tag;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -17,15 +19,18 @@ import android.view.View;
 
 public class CustomView extends View {
 
+    Context myContext;
+    String TAG = CustomView.class.getSimpleName();
     private int color;
     private int labelPosition;
     private Paint circlePaint;
 
-    private  double xNew, yNew, xOld, yOld, radius, width, height;
+    public double xNew, yNew, xOld, yOld, radius, width, height, currentPosX, currentPosY;
     private double smallCirRadius = 15, padding = 20;
     public CustomView(Context context, AttributeSet attributeSet)
     {
         super(context, attributeSet);
+        myContext = context;
         circlePaint = new Paint();
         TypedArray a = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.CustomView, 0, 0);
         try {
@@ -41,10 +46,6 @@ public class CustomView extends View {
         width = this.getMeasuredWidth()/2;
         height = this.getMeasuredHeight()/2;
 
-        //getResources().getDisplayMetrics().widthPixels + " " + ge
-        //Log.e("CustomView", getResources().getDisplayMetrics().widthPixels + " " + getResources().getDisplayMetrics().heightPixels);
-        //Log.e("CustomView", width +"  "+height);
-
         radius = width > height ? height - padding - smallCirRadius : width - padding - smallCirRadius;
         //Log.e("CustomView_Radius: ", String.valueOf(radius));
         circlePaint.setColor(color);
@@ -52,18 +53,20 @@ public class CustomView extends View {
         circlePaint.setStyle(Paint.Style.STROKE);
         circlePaint.setStrokeWidth(3);
 
-        xOld = width - radius;
-        yOld = height;
+        currentPosX = xOld = width - radius;
+        currentPosY = yOld = height;
     }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.e(TAG, "In onDraw Method");
         circlePaint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0));
         RectF rectf = new RectF((float) (width - radius), (float) (height - radius), (float) (width + radius), (float) (height + radius));
         canvas.drawArc(rectf, 180, 180, false, circlePaint);
 
         circlePaint.setPathEffect(null);
-        canvas.drawCircle((float) xOld, (float) yOld, (float) smallCirRadius, circlePaint);
+        canvas.drawCircle((float) currentPosX, (float) currentPosY, (float) smallCirRadius, circlePaint);
+        Log.e(TAG, "On Draw X: "+currentPosX + " Y: "+ currentPosY);
     }
 
     @Override
@@ -95,7 +98,7 @@ public class CustomView extends View {
         requestLayout();
     }
 
-    public void animCalc(double startTime, double endTime, double presentTime, double centreTime, double radius)
+    public void animCalc(double startTime, double endTime, double presentTime, double centerTime)
     {
         double a, b, angle;
         double totalTime = endTime - startTime;
@@ -104,40 +107,57 @@ public class CustomView extends View {
             angle = 0;
             a = 0;
             b = 0;
-            xNew = xOld;
-            yNew = yOld;
+            xNew = xOld + a;
+            yNew = yOld - b;
         }
         else if(presentTime == endTime)
         {
             angle = 180;
             a = 2*radius;
             b = 0;
-            xNew = xOld + 2*radius;
-            yNew = yOld;
-        }
-        else if(centreTime > presentTime)
-        {
-            a = ((centreTime - presentTime)*2*radius)/totalTime;
-            b = Math.sqrt(Math.pow(radius, 2) - Math.pow(a, 2));
-            angle = Math.acos(a/radius);
-            xNew = (radius - a) + xOld;
+            xNew = xOld + a;
             yNew = yOld - b;
         }
-        else if(centreTime == presentTime)
+        else if(centerTime > presentTime)
+        {
+            a = ((centerTime - presentTime)*2*radius)/totalTime;
+            b = Math.sqrt(Math.pow(radius, 2) - Math.pow(a, 2));
+            angle = Math.acos(a/radius);
+            xNew = xOld + (radius - a);
+            yNew = yOld - b;
+        }
+        else if(centerTime == presentTime)
         {
             angle = 90;
             a = radius;
             b = radius;
-            xNew = xOld + radius;
-            yNew = yOld - radius;
+            xNew = xOld + a;
+            yNew = yOld - b;
         }
         else
         {
-            a = ((presentTime - centreTime)*2*radius)/totalTime;
+            a = ((presentTime - centerTime)*2*radius)/totalTime;
             b = Math.sqrt(Math.pow(radius, 2) - Math.pow(a, 2));
             angle = Math.acos(a/radius);
-            xNew = radius + a + xOld;
+            xNew = xOld + radius + a;
             yNew = yOld - b;
         }
+
+        Log.e(TAG, "xNew: " + xNew + " xOld: " + xOld + " yNew: " + yNew +" yOld: " + yOld + "  Angle: " + angle);
+    }
+
+    public void animateCircle()
+    {
+        while (xNew >= currentPosX)
+        {
+            currentPosX += 10;
+            currentPosY -= 10;
+            if(currentPosY < yNew)
+                currentPosY = yNew;
+            Log.e(TAG, "X: "+currentPosX + " Y: "+ currentPosY);
+            this.invalidate();
+            this.requestLayout();
+        }
+        //requestLayout();
     }
 }

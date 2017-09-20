@@ -126,7 +126,7 @@ public final class JasonParser {
                 weather.system.setSunset(sys.getLong("sunset"));
             }
 
-            weather.dateTime = jObject.getLong("dt");
+            weather.setDateTime(jObject.getLong("dt"));
             weather.system.city.setCityId(jObject.getLong("id"));
             weather.system.city.setCityName(jObject.getString("name"));
             weather.condition = jObject.getInt("cod");
