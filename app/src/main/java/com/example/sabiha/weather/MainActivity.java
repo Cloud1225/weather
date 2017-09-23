@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -204,17 +206,30 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
             double preTime = presentTimeCalc();
             Log.e(Tag, String.valueOf(preTime));
             customView.animCalc(weather.system.getSunriseHours(), weather.system.getSunsetHours(), preTime, centerTime);
-            animateCircle();
+
+            customView.setOnClickListener(new View.OnClickListener()
+            {
+
+                @Override
+                public void onClick(View v) {
+                    CustomAnimation ca = new CustomAnimation(customView);
+                    ca.setInterpolator(new LinearInterpolator());
+
+                    ca.setFillAfter(true);
+                    ca.setDuration(60000L);
+                    customView.startAnimation(ca);
+                }
+            });
+            //customView.startAnimation(new CustomAnimation(customView));
+
             tempTV.setText(String.valueOf(weatherDetails.main.getTemperature()));
             descTV.setText(weatherDetails.currentWeather.getDescription());
 
-            if (weatherDetails.iconData != null && weatherDetails.iconData.length > 0) {
-                Bitmap img = BitmapFactory.decodeByteArray(weatherDetails.iconData, 0, weatherDetails.iconData.length);
-                iconView.setImageBitmap(img);
-            }
-
+            Bitmap img = BitmapFactory.decodeByteArray(weatherDetails.iconData, 0, weatherDetails.iconData.length);
+            iconView.setImageBitmap(img);
             windTV.setText("Dir: "+weatherDetails.wind.getWindDirection()+"  Speed: "+weatherDetails.wind.getWindSpeed());
         }
+
     }
 
     private double presentTimeCalc()

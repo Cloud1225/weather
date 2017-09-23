@@ -12,6 +12,9 @@ import android.nfc.Tag;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.Transformation;
 
 /**
  * Created by Sabiha on 9/13/2017.
@@ -159,5 +162,14 @@ public class CustomView extends View {
             this.requestLayout();
         }
         //requestLayout();
+    }
+
+    public void setCurrentPosX(double offset)
+    {
+        currentPosX += offset;
+    }
+    public void setCurrentPosY(double offset)
+    {
+        currentPosY -= offset;
     }
 }
