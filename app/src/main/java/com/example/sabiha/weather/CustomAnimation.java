@@ -11,30 +11,27 @@ import android.view.animation.Transformation;
  */
 
 public class CustomAnimation extends Animation{
-    CustomView view;
-    double stepX, stepY;
+    CustomView customView;
+    double step, currentAngle;
     public CustomAnimation(CustomView view)
     {
-        this.view = view;
-        stepX = Math.abs(view.xNew - view.xOld)/10;
-        stepY = Math.abs(view.yNew - view.yOld)/10;
+        customView= view;
+        step = customView.getAngle() / 10;
+        currentAngle = 0.0;
     }
 
     @Override
     protected void applyTransformation(float interpolatedTime, Transformation t) {
         //super.applyTransformation(interpolatedTime, t);
-        Log.e("Custom Animation", interpolatedTime +"  "+ t.toString());
-        this.
-        view.setCurrentPosX(stepX);
-        view.setCurrentPosY(stepY);
-        if(view.currentPosX >view.xNew || view.currentPosY > view.yNew)
-        {
-            view.currentPosX = view.xNew;
-            view.currentPosY = view.yNew;
+        customView.calcPosition(currentAngle);
+        customView.invalidate();
+        currentAngle += step;
+        if(currentAngle > customView.getAngle()) {
+            //currentAngle = customView.getAngle();
+            currentAngle = 0;
             this.cancel();
         }
-
-        view.invalidate();
+        Log.e("Custom Animation", "Current: " + currentAngle +" Main Angle "+ customView.getAngle());
     }
 
 }

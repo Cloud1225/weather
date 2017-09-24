@@ -22,14 +22,15 @@ import android.view.animation.Transformation;
 
 public class CustomView extends View {
 
-    Context myContext;
-    String TAG = CustomView.class.getSimpleName();
+    private Context myContext;
+    private String TAG = CustomView.class.getSimpleName();
     private int color;
     private int labelPosition;
     private Paint circlePaint;
 
-    public double xNew, yNew, xOld, yOld, radius, width, height, currentPosX, currentPosY;
+    private double xOld, yOld, radius, width, height, currentPosX, currentPosY, angle;
     private double smallCirRadius = 15, padding = 20;
+
     public CustomView(Context context, AttributeSet attributeSet)
     {
         super(context, attributeSet);
@@ -51,25 +52,28 @@ public class CustomView extends View {
 
         radius = width > height ? height - padding - smallCirRadius : width - padding - smallCirRadius;
         //Log.e("CustomView_Radius: ", String.valueOf(radius));
-        circlePaint.setColor(color);
+
         circlePaint.setAntiAlias(true);
-        circlePaint.setStyle(Paint.Style.STROKE);
-        circlePaint.setStrokeWidth(3);
 
         currentPosX = xOld = width - radius;
         currentPosY = yOld = height;
+        Log.e(TAG, "Radius: " + radius + " OldX: " + xOld + " OldY: "+ yOld);
     }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.e(TAG, "In onDraw Method");
+        circlePaint.setColor(color);
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(3);
         circlePaint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0));
         RectF rectf = new RectF((float) (width - radius), (float) (height - radius), (float) (width + radius), (float) (height + radius));
         canvas.drawArc(rectf, 180, 180, false, circlePaint);
 
         circlePaint.setPathEffect(null);
+        circlePaint.setStyle(Paint.Style.FILL);
+        circlePaint.setColor(Color.YELLOW);
         canvas.drawCircle((float) currentPosX, (float) currentPosY, (float) smallCirRadius, circlePaint);
-        Log.e(TAG, "On Draw X: "+currentPosX + " Y: "+ currentPosY);
+        Log.e(TAG, "In Draw X: "+currentPosX + " Y: "+ currentPosY);
     }
 
     @Override
@@ -101,7 +105,74 @@ public class CustomView extends View {
         requestLayout();
     }
 
-    public void animCalc(double startTime, double endTime, double presentTime, double centerTime)
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+    public void setCurrentPosX(double x)
+    {
+        this.currentPosX = x;
+    }
+
+    public double getCurrentPosX()
+    {
+        return currentPosX;
+    }
+    public void setCurrentPosY(double y)
+    {
+        this.currentPosY = y;
+    }
+    public double getCurrentPosY()
+    {
+        return currentPosY;
+    }
+    public void calcAngle(double startTime, double endTime, double presentTime, double centerTime)
+    {
+        double a;
+        double totalTime = endTime - startTime;
+        a = (Math.abs(centerTime - presentTime)*2*radius)/totalTime;
+        angle = presentTime == startTime ? 0 : (presentTime == centerTime ? 90: (presentTime == endTime ? 180 : Math.acos(a/radius) * (180/Math.PI)));
+        if(angle != 180 && presentTime > centerTime)
+            angle = 180 - angle;
+        Log.e(TAG, "  Angle: " + angle);
+    }
+
+    public void calcPosition(double currentAngle)
+    {
+        if(currentAngle == 0)
+        {
+            setCurrentPosX(xOld);
+            setCurrentPosY(yOld);
+        }
+        else if(currentAngle == 90)
+        {
+            setCurrentPosX(xOld + radius);
+            setCurrentPosY(yOld - radius);
+        }
+        else if(currentAngle ==180)
+        {
+            setCurrentPosX(xOld + (2*radius));
+            setCurrentPosY(yOld);
+        }
+        else if(currentAngle > 0 && currentAngle < 90)
+        {
+            setCurrentPosX(xOld + (radius * (1 - Math.cos(currentAngle * Math.PI / 180))));
+            setCurrentPosY(yOld - (radius * Math.sin(currentAngle * Math.PI / 180)));
+        }
+        else if(currentAngle > 90 && currentAngle < 180)
+        {
+            setCurrentPosX(xOld + (radius * (1 + Math.cos((180 - currentAngle) * Math.PI / 180))));
+            setCurrentPosY(yOld - (radius * Math.sin((180 - currentAngle) * Math.PI / 180)));
+        }
+
+        Log.e(TAG, "CurrentPosX: " + currentPosX + " CurrentPosY: " + currentPosY + "  CurrentAngle: " + currentAngle);
+    }
+
+    /*public void animCalc1(double startTime, double endTime, double presentTime, double centerTime)
     {
         double a, b, angle;
         double totalTime = endTime - startTime;
@@ -147,9 +218,9 @@ public class CustomView extends View {
         }
 
         Log.e(TAG, "xNew: " + xNew + " xOld: " + xOld + " yNew: " + yNew +" yOld: " + yOld + "  Angle: " + angle);
-    }
+    }*/
 
-    public void animateCircle()
+    /*public void animateCircle()
     {
         while (xNew >= currentPosX)
         {
@@ -162,14 +233,5 @@ public class CustomView extends View {
             this.requestLayout();
         }
         //requestLayout();
-    }
-
-    public void setCurrentPosX(double offset)
-    {
-        currentPosX += offset;
-    }
-    public void setCurrentPosY(double offset)
-    {
-        currentPosY -= offset;
-    }
+    }*/
 }
