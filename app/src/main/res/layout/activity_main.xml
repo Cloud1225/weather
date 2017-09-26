@@ -37,27 +37,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
-
             <com.example.sabiha.weather.TemperatureCustomView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/temperature_custom_layout"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
                 app:arcColor="@android:color/darker_gray"
                 android:layout_margin="20dp"
                 />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textSize="30sp"
                 android:lineSpacingExtra="10dp"
                 android:id="@+id/temp_textView"
-                android:layout_below="@id/temperature_custom_layout"
                 android:layout_centerHorizontal="true"
                 android:textColor="@android:color/black"
                 android:layout_margin="10dp"
-
+                android:layout_below="@id/temperature_custom_layout"
                 />
             <ImageView
                 android:layout_height="wrap_content"
