@@ -28,7 +28,7 @@ public class CustomView extends View {
     private int labelPosition;
     private Paint circlePaint;
 
-    private double xOld, yOld, radius, width, height, currentPosX, currentPosY, angle;
+    private double xOld, yOld, radius, width, height, currentPosX, currentPosY, angle, currentAngle;
     private double smallCirRadius = 15, padding = 20;
 
     public CustomView(Context context, AttributeSet attributeSet)
@@ -49,6 +49,7 @@ public class CustomView extends View {
     {
         width = this.getMeasuredWidth()/2;
         height = this.getMeasuredHeight()/2;
+        Log.e("CustomView_Radius: ", "Width: "+width + "  Height:  "+height);
 
         radius = width > height ? height - padding - smallCirRadius : width - padding - smallCirRadius;
         //Log.e("CustomView_Radius: ", String.valueOf(radius));
@@ -57,6 +58,7 @@ public class CustomView extends View {
 
         currentPosX = xOld = width - radius;
         currentPosY = yOld = height;
+        currentAngle = 0;
         Log.e(TAG, "Radius: " + radius + " OldX: " + xOld + " OldY: "+ yOld);
     }
     @Override
@@ -69,6 +71,11 @@ public class CustomView extends View {
         RectF rectf = new RectF((float) (width - radius), (float) (height - radius), (float) (width + radius), (float) (height + radius));
         canvas.drawArc(rectf, 180, 180, false, circlePaint);
 
+        circlePaint.setStyle(Paint.Style.FILL);
+        circlePaint.setPathEffect(null);
+        circlePaint.setColor(Color.LTGRAY);
+        canvas.drawArc(rectf, 180, (float) currentAngle, true, circlePaint);
+
         circlePaint.setPathEffect(null);
         circlePaint.setStyle(Paint.Style.FILL);
         circlePaint.setColor(Color.YELLOW);
@@ -79,6 +86,7 @@ public class CustomView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+        Log.e(TAG, widthMeasureSpec+"    "+heightMeasureSpec);
         initialize();
     }
     public int getColor()
@@ -143,6 +151,7 @@ public class CustomView extends View {
 
     public void calcPosition(double currentAngle)
     {
+        this.currentAngle = currentAngle;
         if(currentAngle == 0)
         {
             setCurrentPosX(xOld);

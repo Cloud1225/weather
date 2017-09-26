@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
     String Tag = MainActivity.class.getSimpleName();
     public WeatherDetails weather;
     CustomView customView;
+    TemperatureCustomView temperatureCustomView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
 
         iconView = (ImageView) findViewById(R.id.icon_iView);
         windGIF = (ImageView) findViewById(R.id.windGIF);
+        temperatureCustomView = (TemperatureCustomView) findViewById(R.id.temperature_custom_layout);
         customView = (CustomView) findViewById(R.id.custom_layout);
         //GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(windGIF);
         Glide.with(this).load(R.raw.windmill).into(windGIF);
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
             double preTime = presentTimeCalc();
             Log.e(Tag, String.valueOf(preTime));
             customView.calcAngle(weather.system.getSunriseHours(), weather.system.getSunsetHours(), preTime, centerTime);
-            customView.setOnClickListener(new View.OnClickListener()
+            /*customView.setOnClickListener(new View.OnClickListener()
             {
 
                 @Override
@@ -219,8 +221,12 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
                     customView.invalidate();
                     customView.startAnimation(ca);
                 }
-            });
-            //customView.startAnimation(new CustomAnimation(customView));
+            });*/
+            CustomAnimation ca = new CustomAnimation(customView);
+            ca.setInterpolator(new AccelerateInterpolator());
+            ca.setDuration(9000L);
+            customView.invalidate();
+            customView.startAnimation(ca);
 
             tempTV.setText(String.valueOf(weatherDetails.main.getTemperature()));
             descTV.setText(weatherDetails.currentWeather.getDescription());
