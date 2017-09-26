@@ -143,7 +143,7 @@ public class CustomView extends View {
         double a;
         double totalTime = endTime - startTime;
         a = (Math.abs(centerTime - presentTime)*2*radius)/totalTime;
-        angle = presentTime == startTime ? 0 : (presentTime == centerTime ? 90: (presentTime == endTime ? 180 : Math.acos(a/radius) * (180/Math.PI)));
+        angle = presentTime == startTime ? 0 : (presentTime == centerTime ? 90: (presentTime == endTime || presentTime > endTime ? 180 : Math.acos(a/radius) * (180/Math.PI)));
         if(angle != 180 && presentTime > centerTime)
             angle = 180 - angle;
         Log.e(TAG, "  Angle: " + angle);
@@ -162,7 +162,7 @@ public class CustomView extends View {
             setCurrentPosX(xOld + radius);
             setCurrentPosY(yOld - radius);
         }
-        else if(currentAngle ==180)
+        else if(currentAngle == 180)
         {
             setCurrentPosX(xOld + (2*radius));
             setCurrentPosY(yOld);
