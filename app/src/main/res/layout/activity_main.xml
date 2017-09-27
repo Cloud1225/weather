@@ -43,7 +43,6 @@
                 android:id="@+id/temperature_custom_layout"
                 android:layout_centerHorizontal="true"
                 app:arcColor="@android:color/darker_gray"
-                android:layout_margin="20dp"
                 />
 
             <TextView
@@ -54,7 +53,6 @@
                 android:id="@+id/temp_textView"
                 android:layout_centerHorizontal="true"
                 android:textColor="@android:color/black"
-                android:layout_margin="10dp"
                 android:layout_below="@id/temperature_custom_layout"
                 />
             <ImageView
@@ -74,7 +72,6 @@
                 android:layout_centerHorizontal="true"
                 android:textColor="@android:color/black"
                 android:lineSpacingExtra="10dp"
-                android:layout_margin="10dp"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -85,14 +82,12 @@
                 android:layout_below="@id/desc_textView"
                 android:textColor="@android:color/black"
                 android:lineSpacingExtra="10dp"
-                android:layout_margin="10dp"
                 />
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_below="@id/windTitle_textView"
                 android:id="@+id/windRelLayout"
-                android:layout_margin="10dp"
                 >
                 <ImageView
                     android:layout_width="wrap_content"
@@ -118,7 +113,7 @@
                 android:layout_below="@id/windRelLayout"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:layout_margin="30dp"
+                android:layout_margin="20dp"
                 app:circleColor="@android:color/darker_gray"
                 />
         </RelativeLayout>
