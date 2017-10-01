@@ -222,7 +222,8 @@ public class MainActivity extends AppCompatActivity  implements LocationDetailsP
                     customView.startAnimation(ca);
                 }
             });*/
-            TemperatureCustomAnimation tca = new TemperatureCustomAnimation(temperatureCustomView);
+            TemperatureCustomAnimation tca = new TemperatureCustomAnimation(temperatureCustomView, weather.main.getTemperature(),
+                    weather.main.getTempMax(), weather.main.getTempMin());
             tca.setInterpolator(new AccelerateInterpolator());
             tca.setDuration(9000L);
             temperatureCustomView.startAnimation(tca);

@@ -23,6 +23,7 @@ public class TemperatureCustomView  extends View {
     private double padding = 100;
     private float sweepAngle;
     private final float MAX_ANGLE = 80f;
+    private double temp, maxTemp, minTemp, currentTemp;
 
     public TemperatureCustomView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -64,9 +65,12 @@ public class TemperatureCustomView  extends View {
 
         textPaint.setColor(Color.rgb(255,165,0));
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTextSize(22);
-        String text = "TEST";
-        canvas.drawText(text, (float)(radius+padding), (float)height, textPaint);
+        textPaint.setTextSize(28);
+
+        canvas.drawText(currentTemp+"°", (float)(radius+padding), (float)height, textPaint);
+        canvas.drawText(minTemp+"°", (float)(radius + width + 10), (float)height - 120, textPaint);
+        canvas.drawText(maxTemp+"°", (float)(radius + width + 40), (float)height + 90, textPaint);
+
     }
 
     @Override
@@ -86,5 +90,21 @@ public class TemperatureCustomView  extends View {
 
     public float getMAX_ANGLE() {
         return MAX_ANGLE;
+    }
+
+    public void setCurrentTemp(double currentTemp) {
+        this.currentTemp = currentTemp;
+    }
+
+    public void setTemp(double temp) {
+        this.temp = temp;
+    }
+
+    public void setMaxTemp(double maxTemp) {
+        this.maxTemp = maxTemp;
+    }
+
+    public void setMinTemp(double minTemp) {
+        this.minTemp = minTemp;
     }
 }
